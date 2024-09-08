@@ -1,0 +1,9 @@
+﻿{% extends "base.html" %} {% block content %} {% include "navbar/navbar.html" %}
+{% include "dashboard/dashboard_navbar.html" %}
+<div class="information">
+  <h1>{{ user.username }}</h1>
+  <h1>{{user.first_name}} {{user.last_name}}</h1>
+  <h1>your email: {{ user.email }}</h1>
+  <h1>{{ user.created }}</h1>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+﻿<div class="reply-form">
+  <form
+    action="{% url 'main:handle_parent_comment' object.id comment.id %}"
+    method="post"
+  >
+    {% csrf_token %} {{ form.content }}
+    <input id="reply-form" type="submit" value="reply" />
+  </form>
+</div>

@@ -1,0 +1,30 @@
+﻿{% extends "base.html" %} {% block content %} {% include "navbar/navbar.html" %}
+
+<div class="dashboard">
+  {% include "dashboard/dashboard_navbar.html" %}
+  <div class="dashboard-user-posts">
+    {% if user.post.all.count == 0 %}
+    <div class="dashboard-posts-header">
+      <h1>You don't have any posts.</h1>
+    </div>
+    {% else %}
+    <div class="dashboard-posts-header">
+      <h1>Your posts</h1>
+    </div>
+    {% endif %}
+
+    <span></span>
+    {% for post in user_posts %}
+    <div class="user-post">
+      <a href="{{ post.get_absolute_url }}">
+        <img
+          class="dashboard-post-image"
+          src="{{ post.photo.url }}"
+          alt="no image found"
+        />
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+﻿<div class="comment-form">
+  <form action="{% url 'main:handle_comment' object.id %}" method="post">
+    {% csrf_token %} {{ form.content }}
+    <input id="comment-form" type="submit" value="comment" />
+  </form>
+</div>

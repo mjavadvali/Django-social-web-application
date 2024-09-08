@@ -1,0 +1,5 @@
+﻿1- content and photo disapears when navigating to tag_users.
+
+2- create a search system for chooding users that are gonna be tagged. 
+
+3- load more posts

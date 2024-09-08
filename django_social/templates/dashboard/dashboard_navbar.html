@@ -1,0 +1,24 @@
+﻿<div class="dashboard-navbar">
+  <ul class="dashboard-list">
+    <li class="dashboard-list-element">
+      <a class="dashboard-link" href="{% url 'dashboard' %}">Dashboard</a>
+    </li>
+    <li class="dashboard-list-element">
+      <a class="dashboard-link" href="default.asp">Settings</a>
+    </li>
+    <li class="dashboard-list-element">
+      <a class="dashboard-link" href="{% url 'saved' %}">Saved posts</a>
+    </li>
+    <li class="dashboard-list-element">
+      <a class="dashboard-link" href="{% url 'personal_information' %}"
+        >Your info</a
+      >
+    </li>
+    <form action="{% url 'logout' %}" method="post">
+      {% csrf_token %}
+      <li class="dashboard-list-element">
+        <button class="logout-button" type="submit">logout</button>
+      </li>
+    </form>
+  </ul>
+</div>

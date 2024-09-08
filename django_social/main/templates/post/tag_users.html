@@ -1,0 +1,17 @@
+﻿{% extends "base.html" %} {% block content %} {% include "navbar/navbar.html" %}
+
+<div class="tag-users">
+  <h1>Plase select your users</h1>
+  <form method="post">
+    {% csrf_token %}
+    <div class="scrollable-container">
+      {% for user in users %}
+      <input type="checkbox" name="tagged_users" value="{{ user.id }}" />
+      <s></s>
+      {{ user.username }}<br />
+      {% endfor %}
+    </div>
+    <button type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+﻿
+{% extends "base.html" %}
+{% block content %}
+  {% include "navbar/navbar.html" %}
+  <header>
+    <nav>
+        <ul>
+          <li><a href="{% url 'main:listview' %}">Home</a></li>
+        </ul>
+      </nav>
+    </header>
+    <form action="{% url 'profile' user.username %}" method="POST">
+      {% csrf_token %}
+        <div class="follow">
+        <button id="follow-button" data-user-id="{{user.id}}">
+          {% if is_following %} Unfollow {% else %} Follow {% endif %}
+        </button>
+      </div>
+    </form>
+    <main>
+      <h1>Profile of {{ user.username }}</h1>
+      <a href="{% url 'private_chat' user.username %}">send direct message to {{ user.username }}</a>
+      <section class="user-posts">
+        <h2>{{user.username}}'s posts</h2>
+        {% for post in user_posts %}
+<img src="{{ post.photo.url }}" alt="not found" />
+<p>{{post.content}}</p>
+{% endfor %}
+    
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function () {
+      console.log("ajax is working.");
+      
+      $("#follow-button").click(function (event) {
+
+        event.preventDefault();
+        var UserId = $(this).data("user-id");
+        var username = "{{ user.username }}";
+        console.log(username);
+        
+        $.ajax({
+          url: "{% url 'profile' user.username  %}",
+          type: "POST",
+          data: {
+            user_id: UserId,
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+          },
+          success: function (response){
+            if (response.is_following) {
+              $("#follow-button").text("Unfollow");
+            } else {
+              $("#follow-button").text("Follow");
+            }
+          }
+        });
+      });
+    });
+  </script>
+{% endblock  %}

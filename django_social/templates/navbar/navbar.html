@@ -1,0 +1,87 @@
+﻿<div class="navbar">
+  <div class="site">
+    <a href="{% url 'main:listview' %}">
+      <p>Social Django</p>
+    </a>
+  </div>
+  <div class="search">
+    <form id="search-form" action="{% url 'main:search' %}" method="get">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="search for users ... "
+      />
+    </form>
+    <div id="search-results"></div>
+  </div>
+  <div class="add_post">
+    <a href="{% url 'main:create_post' %}"> Add a post </a>
+  </div>
+  <a href="{% url 'dashboard' %}">
+    <div class="dashboard-button">Dashboard</div>
+  </a>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM fully loaded and parsed");
+
+    const searchForm = document.getElementById("search-form");
+    const searchInput = document.getElementById("search-input");
+    const searchResults = document.getElementById("search-results");
+
+    if (searchForm && searchInput && searchResults) {
+      console.log("Search input and results container found in the DOM");
+
+      searchForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+      });
+
+      searchInput.addEventListener("input", function () {
+        const query = searchInput.value.trim();
+        console.log("User input:", query);
+
+        if (query.length > 0) {
+          fetch(`{% url 'main:search' %}?q=${encodeURIComponent(query)}`)
+            .then((response) => {
+              console.log("Fetch response received"); // Debug log to confirm fetch response
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              console.log("Data received:", data);
+              searchResults.innerHTML = "";
+
+              if (data.length === 0) {
+                searchResults.innerHTML = "<p>No users found.</p>";
+              } else {
+                const ul = document.createElement("ul");
+
+                data.forEach((user) => {
+                  const li = document.createElement("li");
+                  const a = document.createElement("a");
+                  a.href = user.url;
+                  a.textContent = user.username;
+                  li.appendChild(a);
+                  ul.appendChild(li);
+                });
+
+                searchResults.appendChild(ul);
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching search results:", error);
+              searchResults.innerHTML =
+                "<p>An error occurred while searching.</p>";
+            });
+        } else {
+          searchResults.innerHTML = "";
+        }
+      });
+    } else {
+      console.error("Search input or results element not found in the DOM.");
+    }
+  });
+</script>

@@ -1,0 +1,49 @@
+﻿{% extends "base.html" %} {% block content %} {% include "navbar/navbar.html" %}
+{% for post in object_list %}
+<div class="post">
+  <div class="avatar">
+    <!-- <img src="/django_social/media/profile_images/avatar.png" alt="" /> -->
+    <img
+      class="avatar-image"
+      src="{{ post.user.profile_img.url }}"
+      alt="User's avatar"
+    />
+    {% if post.user == request.user %}
+    <a href="{% url 'dashboard' %}">
+      <p class="username">{{post.user.first_name}} {{post.user.last_name}}</p>
+    </a>
+    {% else %}
+    <a href="{{ post.user.get_absolute_url }}">
+      <p class="username">{{post.user.first_name}} {{post.user.last_name}}</p>
+    </a>
+    {% endif %}
+
+    <p class="date">{{post.created}}</p>
+  </div>
+  <div class="caption">
+    <p class="caption-content">{{ post.content }}</p>
+  </div>
+  <div class="post-image">
+    <a href="{{post.get_absolute_url}}">
+      <img class="post_image" src="{{ post.photo.url }}" width: 98% height: 98%
+      />
+    </a>
+  </div>
+  <div class="icons">
+    <a href="{% url 'main:handle_like' post.id %}">
+      {% include "buttons/like.html" %}
+    </a>
+    <p>
+      {% if post.number_of_likes > 0 %} {{ post.number_of_likes }} {% else %} no
+      likes {% endif %}
+    </p>
+    <a href=""> {% include "buttons/comment.html" %} </a>
+
+    <a href="{% url 'main:bookmark_post' post.id %}">
+      {% include "buttons/bookmark.html" %}
+    </a>
+    {% if post.number_of_bookmarks > 0 %} {{ post.number_of_bookmarks }} {% else
+    %} {% endif %}
+  </div>
+</div>
+{% endfor %} {% endblock %}
