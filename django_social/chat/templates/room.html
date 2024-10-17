@@ -33,6 +33,13 @@
       const chatSocket = new WebSocket(
         "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
       );
+      chatSocket.onopen = function (e) {
+        console.log("WebSocket is connected.");
+      };
+
+      chatSocket.onerror = function (e) {
+        console.error("WebSocket error:", e);
+      };
 
       chatSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
@@ -40,6 +47,7 @@
         if (data.messages) {
           const chat = document.getElementById("chat-container");
           chat.innerHTML = "";
+          chat.scrollTop = chat.scrollHeight;
 
           for (const [content, username] of Object.entries(data.messages)) {
             const source = username === Username ? "me" : "other";
@@ -61,7 +69,9 @@
         }
 
         // Handle new chat messages
-        if (data.message && data.user) {
+
+        if (data.message) {
+          console.log(data.message);
           const chat = document.getElementById("chat-container");
           const source = data.user === Username ? "me" : "other";
           const name = data.user === Username ? "Me" : data.user;
@@ -85,29 +95,42 @@
         console.error("Chat socket closed unexpectedly");
       };
 
-      document.querySelector("#chat-message-input").focus();
-      document.querySelector("#chat-message-input").onkeyup = function (e) {
-        if (e.keyCode === 13) {
-          document.querySelector("#chat-message-submit").click();
-        }
-      };
+      const input = document.getElementById("chat-message-input");
+      const submitButton = document.getElementById("chat-message-submit");
 
-      document.querySelector("#chat-message-submit").onclick = function (e) {
-        const messageInputDom = document.querySelector("#chat-message-input");
-        const message = messageInputDom.value;
-        chatSocket.send(
-          JSON.stringify({
-            message: message,
-            username: Username,
-          })
-        );
-        messageInputDom.value = "";
-      };
+      submitButton.addEventListener("click", function (event) {
+        const message = input.value;
+        console.log("message");
+
+        console.log(message);
+
+        if (message) {
+          console.log("this is toggled.");
+
+          chatSocket.send(
+            JSON.stringify({ message: message, username: Username })
+          );
+          input.value = "";
+          input.focus();
+        }
+      });
+
+      input.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          // cancel the default action, if needed
+          event.preventDefault();
+          // trigger click event on button
+          submitButton.click();
+        }
+      });
+
+      input.focus();
     </script>
   </body>
 
   <style>
     .chat-wrapper {
+      margin: auto;
       position: relative;
       border: 2px solid lightgray;
       width: 40rem;

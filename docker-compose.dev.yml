@@ -1,0 +1,23 @@
+﻿services:
+  cache:
+    image: redis:7.0.4
+    restart: always
+    volumes:
+      - ./data/cache:/data
+  backend:
+    container_name: dj-backend
+    build: 
+      context: .
+      dockerfile: ./config/django/Dockerfile
+    volumes:
+      - ./django_social:/usr/src/app
+    working_dir: /usr/src/app
+    command: python manage.py runserver 0.0.0.0:8000 --settings=config.settings.local  
+      # sh -c "python manage.py makemigrations --settings=config.settings.local &&
+      #        python manage.py migrate --settings=config.settings.local &&
+      #        python manage.py runserver 0.0.0.0:8000 --settings=config.settings.local"
+    ports:
+      - "8000:8000"
+    restart: always
+    depends_on:
+      - cache

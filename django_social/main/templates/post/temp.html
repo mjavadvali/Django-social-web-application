@@ -30,7 +30,7 @@
     </a>
   </div>
   <div class="icons">
-    <a href="{% url 'main:handle_like' post.id %}">
+    <a href="{% url 'main:handle_like' post.slug %}">
       {% include "buttons/like.html" %}
     </a>
     <p>
@@ -39,7 +39,7 @@
     </p>
     <a href=""> {% include "buttons/comment.html" %} </a>
 
-    <a href="{% url 'main:bookmark_post' post.id %}">
+    <a href="{% url 'main:bookmark_post' post.slug %}">
       {% include "buttons/bookmark.html" %}
     </a>
     {% if post.number_of_bookmarks > 0 %} {{ post.number_of_bookmarks }} {% else

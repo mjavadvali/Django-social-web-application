@@ -1,6 +1,23 @@
 ﻿<div class="comment-form">
-  <form action="{% url 'main:handle_comment' object.id %}" method="post">
+  <form action="{% url 'main:handle_comment' object.slug %}" method="post">
     {% csrf_token %} {{ form.content }}
-    <input id="comment-form" type="submit" value="comment" />
+    <div
+      class="reply-form"
+      style="
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-around;
+      "
+    >
+      <h3>wanna reply to a comment</h3>
+      {{ form.parent }}
+    </div>
+    <input
+      style="width: 30rem; background: #4e9fff; border: none"
+      id="comment-form"
+      type="submit"
+      value="comment"
+    />
   </form>
 </div>

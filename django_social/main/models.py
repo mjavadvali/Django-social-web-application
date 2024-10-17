@@ -3,6 +3,14 @@ from account.models import User
 from datetime import datetime
 from django.urls import reverse
 import uuid
+from django.utils.text import slugify
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
+from django.core.validators import FileExtensionValidator
+from PIL import Image, ImageFilter
+from django.core.files.base import ContentFile
+from io import BytesIO
+
 
 def user_directory_path(instance, filename):
     return 'posts/{0}/{1}/{2}'.format(instance.user.id, datetime.now().strftime('%Y-%m-%d'), filename)
@@ -10,13 +18,29 @@ def user_directory_path(instance, filename):
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to=user_directory_path, null=True)
+    photo = models.ImageField(upload_to=user_directory_path, null=True, 
+                              validators= [
+                                FileExtensionValidator (
+                                    allowed_extensions=["jpg", "jpeg", "png", "webp"],
+                                    message='{extention} is not allowed. allowed extensions arer  jpg, jpeg, png'
+                                        )
+                                    ]
+                                )
+    photo_standard = ImageSpecField(
+        source='photo',
+        processors=[ResizeToFill(406, 227)],
+        format='JPEG',
+        options={"quality": 90}
+    )
     created = models.DateTimeField(auto_now_add=True)  
     updated = models.DateTimeField(auto_now=True)
     content = models.TextField()
     likes = models.ManyToManyField(User, related_name='post_like', blank=True)
     bookmarks = models.ManyToManyField(User, related_name='saved_posts', blank=True)
-    tagged_users = models.ManyToManyField(User, related_name='tagged_posts', blank=True) 
+    tagged_users = models.ManyToManyField(User, related_name='tagged_posts', blank=True)
+
+    title = models.CharField(max_length=250, blank=False)
+    slug = models.SlugField(unique=True) 
 
     STATUS_CHOICES = (
         ('draft', 'Draft'),
@@ -28,7 +52,7 @@ class Post(models.Model):
         return f'Post by {self.user.username}'
     
     def get_absolute_url(self):
-        return reverse('main:post_detail', args=[self.id])
+        return reverse('main:post_detail', args=[self.slug])
 
     @property
     def number_of_likes(self):
@@ -37,6 +61,28 @@ class Post(models.Model):
     @property
     def number_of_bookmarks(self):
         return self.bookmarks.count()
+    
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+
+        target_width = 1000
+        img = Image.open(self.photo)
+        target_height = img.height
+        target_width = max(target_width, img.width)
+        background = Image.new("RGB", (target_width, target_height))
+        blurred_image = img.filter(ImageFilter.GaussianBlur(10))
+        background.paste(blurred_image, ((target_width - img.width) // 2, 0))
+        offset = ((target_width - img.width) // 2, 0) 
+        background.paste(img, offset)
+
+        buffer = BytesIO()
+        background.save(buffer, format='JPEG')
+
+        original_filename = self.photo.name.split('/')[-1]
+        self.photo.save(original_filename, ContentFile(buffer.getvalue()), save=False)
+
+        return super().save(*args, **kwargs)
     
     
 class Like(models.Model):
@@ -102,4 +148,4 @@ class Comment(models.Model):
         return Comment.objects.filter(parent=self).reverse()
     
     def __str__(self):
-        return f'comment by {self.user} on post {self.post}'
+        return f'{self.user}: {self.content[:25] if self.content else ""}'

@@ -36,12 +36,9 @@ class User(AbstractUser):
     is_staff = models.BooleanField(default=False, verbose_name='staff')
     bio = models.TextField(blank=True, max_length=500)
     profile_img = models.ImageField(upload_to='profile_images',default='/profile_images/avatar.png')
-    followers = models.IntegerField(default=0)
-    followings= models.IntegerField(default=0)
     posts = models.IntegerField(default=0)
-    
-    follows = models.ManyToManyField('self', related_name='followed_by', blank= True, symmetrical=False)
-
+    followings = models.PositiveIntegerField(default=0)
+    followers = models.PositiveIntegerField(default=0)
     objects = CustomUserManager()
 
     REQUIRED_FIELDS = ['email', ]
@@ -55,3 +52,37 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+class UserFollowing(models.Model):
+
+    FOLLOW_CHOICES = (
+        ('Follow', 'Follow'),
+        ('Unfollow', 'Unfollow'),
+    )
+    
+    following_user = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
+    followed_user = models.ForeignKey(User, related_name='followed_by', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    value = models.CharField(max_length=50, choices=FOLLOW_CHOICES)
+
+
+    def __str__(self):
+        return f'{self.following_user} follows {self.followed_user}'
+    
+
+    # def save(self, *args, **kwargs):
+    #     following_user = User.objects.get(username=self.following_user.username)
+    #     followed_by = User.objects.get(username=self.followed_user.username)
+        
+    #     if self.value == 'Follow': 
+    #         following_user.followings += 1
+    #         following_user.save()
+    #         followed_by.followings += 1
+    #         followed_by.save()
+    #     elif self.value == 'Unfollow':       
+    #         following_user.followings -= 1
+    #         following_user.save()
+    #         followed_by.followings -= 1
+    #         followed_by.save()
+    #     super().save(*args, **kwargs)

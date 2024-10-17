@@ -1,0 +1,71 @@
+﻿<div class="post">
+  <div class="avatar">
+    <img
+      class="avatar-image"
+      src="{{ post.user.profile_img.url }}"
+      alt="User's avatar"
+    />
+    {% if post.user == request.user %}
+    <a href="{% url 'dashboard' %}">
+      <h3 class="username">
+        {{ post.user.first_name }} {{ post.user.last_name }}
+      </h3>
+    </a>
+    {% else %}
+    <a href="{{ post.user.get_absolute_url }}">
+      <p class="username">
+        {{ post.user.first_name }} {{ post.user.last_name }}
+      </p>
+    </a>
+    {% endif %}
+    <p style="margin-left: 4rem" class="date">{{ post.created }}</p>
+  </div>
+  <div class="caption">
+    <h2
+      style="text-align: -webkit-left; margin-left: 1rem"
+      class="caption-content"
+    >
+      {{ post.title }}
+    </h2>
+    <div class="post-image">
+      <a href="{{ post.get_absolute_url }}">
+        <img
+          class="post_image"
+          src="{{ post.photo.url }}"
+          style="width: 98%; height: 98%"
+        />
+      </a>
+    </div>
+    <div class="icons">
+      <div class="icon-container">
+        <a href="{% url 'main:handle_like' post.slug %}">
+          {% include "buttons/like.html" %}
+        </a>
+        <p>
+          {% if post.number_of_likes > 0 %} {{ post.number_of_likes }}
+          <span></span>
+          {% endif %}
+        </p>
+      </div>
+      <div class="icon-container">
+        <a href="{{ post.get_absolute_url }}">
+          {% include "buttons/comment.html" %}
+        </a>
+        <p>
+          {% if post.number_of_comments > 0 %} {{ post.number_of_comments }}
+          <span></span>
+          {% endif %}
+        </p>
+      </div>
+      <div class="icon-container">
+        <a href="{% url 'main:bookmark_post' post.slug %}">
+          {% include "buttons/bookmark.html" %}
+        </a>
+        <p>
+          {% if post.number_of_bookmarks > 0 %} {{ post.number_of_bookmarks }}
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

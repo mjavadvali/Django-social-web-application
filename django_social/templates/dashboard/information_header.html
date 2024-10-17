@@ -1,0 +1,32 @@
+﻿<div class="user-info">
+  <div class="avatar">
+    <!-- <img src="/django_social/media/profile_images/avatar.png" alt="" /> -->
+    <img
+      class="avatar-image"
+      src="{{ post.user.profile_img.url }}"
+      alt="User's avatar"
+    />
+    {% if post.user == request.user %}
+    <a href="{% url 'dashboard' %}">
+      <h3 class="username">{{post.user.first_name}} {{post.user.last_name}}</h3>
+    </a>
+    {% else %}
+    <a href="{{ post.user.get_absolute_url }}">
+      <p class="username">{{post.user.first_name}} {{post.user.last_name}}</p>
+    </a>
+    {% endif %}
+
+    <p style="margin-left: 4rem" class="date">{{post.created}}</p>
+  </div>
+</div>
+
+<style>
+  div .user-info {
+    border: 2px solid red;
+    width: 3rem;
+    height: 4rem;
+    height: 15rem;
+    width: 61rem;
+    margin: auto;
+  }
+</style>

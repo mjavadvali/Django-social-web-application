@@ -1,1 +1,11 @@
 ﻿config/uwsgi_app.sock
+config/daphne.sock
+config/daphne.sock.lock
+wait-for-it.sh
+media/
+env/
+db.sqlite3
+staticfiles/
+__pycache__/
+*.pyc
+*.log

@@ -4,16 +4,25 @@ from django.utils.translation import gettext_lazy as _
 
 
 class PostForm(forms.ModelForm):
+
     class Meta:
         model = Post
-        fields = ['content', 'photo']
+        fields = ['title' ,'content', 'photo', 'tagged_users']
 
+    def __init__(self, *args, **kwargs):
+        super(PostForm, self).__init__(*args, **kwargs)
+        self.fields['title'].widget.attrs.update({'class': 'form-input', 'placeholder': 'enter the title of your post ...'})
+        self.fields['content'].widget.attrs.update({'class': 'form-input', 'placeholder': 'type the content of your post ...'})
+        self.fields['photo'].widget.attrs.update({'class': 'photo-form'})
+        
+        self.user = kwargs.pop('user', None)
 
+    
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment        
 
-        fields = ['content']
+        fields = ['content', 'parent']
         
         labels = {
             'content': _(''),
@@ -22,3 +31,9 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'content' : forms.TextInput(),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super(CommentForm, self).__init__(*args, **kwargs)
+        self.fields['content'].widget.attrs.update({'class': 'comment-input', 'placeholder': 'comment ...'})
+        self.fields['parent'].widget.attrs.update({'class': 'reply-input-choices', 'placeholder': 'reply to ...'})
+

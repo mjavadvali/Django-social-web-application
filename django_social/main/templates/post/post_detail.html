@@ -1,94 +1,33 @@
-﻿{% extends "base.html" %} {% block content %} {% include "navbar/navbar.html" %}
-<div class="post">
-  <div class="avatar">
-    <!-- <img src="/django_social/media/profile_images/avatar.png" alt="" /> -->
-    <img
-      class="avatar-image"
-      src="{{ object.user.profile_img.url }}"
-      alt="User's avatar"
-    />
-    {% if object.user == request.user %}
-    <a href="{% url 'dashboard' %}">
-      <p class="username">
-        {{object.user.first_name}} {{object.user.last_name}}
-      </p>
-    </a>
-    {% else %}
-    <a href="{{ object.user.get_absolute_url }}">
-      <p class="username">
-        {{object.user.first_name}} {{object.user.last_name}}
-      </p>
-    </a>
-    {% endif %}
-
-    <p class="date">{{object.created}}</p>
-  </div>
-  <div class="caption">
-    <p class="caption-content">{{ object.content }}</p>
-  </div>
-  <div class="post-image">
-    <a href="{{object.get_absolute_url}}">
-      <img class="post_image" src="{{ object.photo.url }}" width: 98% height:
-      98% />
-    </a>
-  </div>
-  <div class="icons">
-    <a href="{% url 'main:handle_like' post.id %}">
-      {% include "buttons/like.html" %}
-    </a>
-    <p>
-      {% if post.number_of_likes > 0 %} {{ object.number_of_likes }} {% else %}
-      no likes {% endif %}
-    </p>
-    <a href=""> {% include "buttons/comment.html" %} </a>
-    {% include "buttons/bookmark.html" %}
-    <p>4</p>
-  </div>
-</div>
+﻿{% extends "base.html" %} {% block content %}
+<span></span>
+{% include "navbar/navbar.html" %} {% include "post/post.html" %} 
 {% if request.user == object.user %}
 <a href="{% url 'main:post_delete' object.id %}">
   <button class="delete-button">Delete</button>
 </a>
 {% endif %}
-
-<div class="comment-section">
-  {% include "form/comment.html" %} {% for comment in comments %}
-  <span></span>
-  {% if not comment.parent %}
-  <div class="comment">
-    <div class="comment-header">
-      <img
-        class="comment-avatar"
-        src="{{ comment.user.profile_img.url }}"
-        alt="User's avatar"
-      />
-      <p>{{ comment.user.username }}</p>
-    </div>
-    <p class="comment-content">{{ comment.content }}</p>
-
-    {% include "buttons/comment.html" %} {% include "form/reply.html" %}
-
-    <div class="replies">
-      {% for c in comment.children %}
-      <div class="reply">
-        <div class="reply-header">
-          <img
-            class="comment-avatar"
-            src="{{ c.user.profile_img.url }}"
-            alt="User's avatar"
-          />
-
-          <p>{{ c.user.username }}</p>
-        </div>
-
-        <p class="reply-content">replying to {{ c.parent.user }}</p>
-        <p class="reply-content">{{ c.content }}</p>
-        {% include "buttons/comment.html" %} {% include "form/reply.html" %}
-        <span></span>
-        {% endfor %}
+<div
+  class="comment-section"
+  style="display: flex; flex-direction: column; align-items: center"
+>
+  {% include "form/comment.html" %}
+  <div class="comments-containter">
+    {% for comment in comments %}
+    <div class="comment_unit">
+      <div class="comment-header">
+        <img src="{{comment.user.profile_img.url}}" alt="" />
+        <h3>{{comment.user.first_name}} {{ comment.user.last_name }}</h3>
       </div>
+      {% if comment.parent %}
+      <p style="color: #393737">
+        <span style="margin-left: 20px"></span>reply to {{comment}}
+      </p>
+      {% endif %}
+      <p><span style="margin-left: 20px"></span>{{ comment.content }}</p>
     </div>
-    {% endif %} {% endfor %}
+
+    {% endfor %}
   </div>
+
   {% endblock %}
 </div>

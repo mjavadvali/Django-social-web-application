@@ -6,5 +6,6 @@ requests
 channels
 channels-redis
 psycopg2-binary
-uwsgi
 daphne
+django-imagekit
+gunicorn

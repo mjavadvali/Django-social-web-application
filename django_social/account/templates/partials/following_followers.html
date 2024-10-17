@@ -1,0 +1,32 @@
+﻿{% load follow_filter %}
+
+<div class="followings-container">
+  <h2>{{ title }}</h2>
+  <div class="following-list">
+    {% for user in users %}
+    <div class="following-item">
+      <div class="profile-img">
+        <img src="{{ user.profile_img.url }}" alt="{{ user.username }}" />
+      </div>
+      <div class="user-info">
+        <a href="{{ user.get_absolute_url }}">{{ user.username }}</a>
+        <p>{{ user.first_name }} {{ user.last_name }}</p>
+      </div>
+      <div class="follow-action">
+        <form action="{% url 'profile' user.username %}" method="POST">
+          {% csrf_token %}
+          <button
+            id="follow-btn"
+            class="follow-button"
+            data-user-username="{{ user.username }}"
+          >
+            {% if is_following %} Unfollow {% else %} Follow {% endif %}
+          </button>
+        </form>
+      </div>
+    </div>
+    {% empty %}
+    <p>No {{ title }} to display.</p>
+    {% endfor %}
+  </div>
+</div>

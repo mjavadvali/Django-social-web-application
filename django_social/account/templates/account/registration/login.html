@@ -1,6 +1,19 @@
-﻿<h2>Login</h2>
-<form method="post">
-  {% csrf_token %} {{ form.as_p }}
-  <button type="submit">Login</button>
-  <p>Wanna create an account? <a href="{% url 'signup' %}">sign up</a></p>
-</form>
+﻿{% extends "base.html" %} {% block content %}
+<div class="login-container">
+  <header>
+    <h2>Login</h2>
+  </header>
+
+  <form method="post">
+    {% csrf_token %} {{ form.as_p }}
+    <div class="button">
+      <button type="submit" class="btn-login">Login</button>
+    </div>
+  </form>
+  <footer>
+    <p class="signup-link">
+      Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>
+    </p>
+  </footer>
+</div>
+{% endblock %}

@@ -1,7 +1,6 @@
 
 
 from pathlib import Path
-
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -14,12 +13,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = 'django-insecure-c5k2q%tgh18=lsw)bi50q6hoaae&(swyvnk&v7_1+&9*q^1x9='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
+DEBUG = True
 
-# Application definition
+
+
 
 INSTALLED_APPS = [
     'daphne',
@@ -34,7 +33,8 @@ INSTALLED_APPS = [
     'chat',
     'rest_framework',
 
-    'api.api_main'
+    'api.api_main',
+
 
 ]
 
@@ -64,6 +64,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+
+            
         },
     },
 ]
@@ -74,12 +76,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -112,19 +114,9 @@ USE_I18N = True
 
 USE_TZ = True
 
-import os
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Example path to a common static directory
-]
-
-# For production
-STATIC_ROOT = BASE_DIR / "staticfiles"# STATIC_ROOT = ((os.path.join(BASE_DIR, 'static')), )
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "static"
+STATICFILES_DIRS = [BASE_DIR / "staticfiles"]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -154,7 +146,7 @@ SIGNUP_REDIRECT_URL = 'main:listview'
 LOGIN_URL ='login'
 LOGOUT_REDIRECT_URL= 'login'
 
-MEDIA_URL = '/media/' 
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
@@ -170,9 +162,9 @@ CHANNEL_LAYERS = {
 
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

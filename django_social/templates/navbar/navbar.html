@@ -1,7 +1,7 @@
 ﻿<div class="navbar">
   <div class="site">
     <a href="{% url 'main:listview' %}">
-      <p>Social Django</p>
+      <h2>Social Django</h2>
     </a>
   </div>
   <div class="search">
@@ -15,10 +15,12 @@
     <div id="search-results"></div>
   </div>
   <div class="add_post">
-    <a href="{% url 'main:create_post' %}"> Add a post </a>
+    <a href="{% url 'main:create_post' %}">
+      <h3>Add a post</h3>
+    </a>
   </div>
   <a href="{% url 'dashboard' %}">
-    <div class="dashboard-button">Dashboard</div>
+    <div class="dashboard-button"><h2>Dashboard</h2></div>
   </a>
 </div>
 

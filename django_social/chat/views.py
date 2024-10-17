@@ -6,8 +6,8 @@ from .models import Chat
 def index(request):
     return render(request, "index.html")
 
-def room(request, room_name):
-    return render(request, "room.html", {"room_name": room_name})
+def room(request, username):
+    return render(request, "new_room.html", {"room_name": 'room'})
 
 
 def private_chat(request, username):

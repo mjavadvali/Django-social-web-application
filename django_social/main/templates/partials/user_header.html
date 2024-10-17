@@ -1,0 +1,87 @@
+﻿<div class="user-header">
+  <div class="avatar">
+    <img
+      class="avatar-image"
+      src="{{ user.profile_img.url }}"
+      alt="User's avatar"
+    />
+
+    <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+    <div class="button-container">
+      {% if button_text %}
+      <button class="message-button">
+        <a href="{% url 'private_chat' user.username %}"> Message </a>
+      </button>
+      <form action="{% url 'profile' user.username %}" method="POST">
+        {% csrf_token %}
+        <button
+          id="follow-btn"
+          class="follow-button"
+          data-user-username="{{ user.username }}"
+        >
+          {% if is_following %} Unfollow {% else %} Follow {% endif %}
+        </button>
+      </form>
+    </div>
+    {% else %}
+
+    <form
+      enctype="multipart/form-data"
+      action="{% url 'dashboard' %}"
+      method="post"
+    >
+      {% csrf_token %}
+      <input type="file" name="avatar" accept="image/*" />
+      <input type="submit" placeholder="save" />
+    </form>
+    {% endif %}
+  </div>
+  <div class="profile-stats">
+    <div class="stat">
+      <span class="number">
+        <a href="{% url 'followings' user.username %}">
+          {{ user.followings }}
+        </a>
+      </span>
+      <span class="label"> Following </span>
+    </div>
+    <div class="stat">
+      <span class="number"
+        ><a href="{% url 'followers' user.username %}">
+          {{ user.followers }}
+        </a></span
+      >
+      <span class="label">Followers</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  function handleFileChange(event) {
+    const file = event.target.files[0];
+    if (file) {
+      console.log("Selected file:", file.name);
+    }
+  }
+
+  document
+    .getElementById("avatar-form")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+      const url = this.action;
+
+      fetch(url, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Success:", data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    });
+</script>

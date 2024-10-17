@@ -1,22 +1,21 @@
-﻿{% extends "base.html" %} {% block content %}
+﻿{% extends "base.html" %} {% block content %}{% include "navbar/navbar.html" %}
 
-<span></span>
-{% include "navbar/navbar.html" %}
-<div class="post_form">
-  <form
-    action="{% url 'main:create_post' %}"
-    method="post"
-    enctype="multipart/form-data"
-  >
-    {% csrf_token %} {{ form }}
+<div class="temp_post_create">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="id_title">Title</label>
+    {{ form.title }}
 
-    <a
-      href="{% url 'main:tag_users' %}?next={% url 'main:create_post' %}"
-      class="btn btn-secondary"
-      >Wanna tag others?</a
-    >
-    <div></div>
-    <input type="submit" value="post" />
+    <label for="id_content">Content</label>
+    {{ form.content }}
+
+    <label for="id_photo">Photo:</label>
+    {{ form.photo}}
+
+    <label for="id_tagged_users">Want to tag others?</label>
+    {{ form.tagged_users}}
+
+    <button type="submit" class="post-button">Post</button>
   </form>
 </div>
 {% endblock %}

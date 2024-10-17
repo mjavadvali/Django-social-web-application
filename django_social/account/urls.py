@@ -2,6 +2,8 @@
 from django.contrib.auth import views as auth_views
 from . import views
 
+# app_name = 'account'
+
 urlpatterns = [
     # path('', include('django.contrib.auth.urls')),
     # path('', views.dashboard, name='dashboard'),
@@ -16,5 +18,14 @@ urlpatterns = [
     path('dashboard/user_settings', views.user_settings, name='user_settings'),
     path('profile/<str:username>', views.UserProfileView.as_view(), name='profile'),
     path('profile/profile_settings', views.profile_settings, name='profile_settings'),
+    path('profile/<str:username>/followings', views.show_followings, name='followings'),
+    path('profile/<str:username>/followers', views.show_followers, name='followers'),
+
     # path('follow_user/<str:username>', views.follow_user, name='follow_user'),       
+    # path('follow_user/<uuid:id>', views.follow_user, name='follow_user'),
+
+
+    # path('profile/<str:username>/followings/', UserFollowListView.as_view(), {'follow_type': 'followings'}, name='user-followings'),
+    # # URL for viewing followers
+    # path('profile/<str:username>/followers/', UserFollowListView.as_view(), {'follow_type': 'followers'}, name='user-followers'),
 ]

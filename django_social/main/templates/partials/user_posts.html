@@ -1,0 +1,15 @@
+﻿<div class="user-posts-wrapper">
+  {% if user_posts %} {% for post in user_posts %}
+  <div class="user-post">
+    <a href="{{ post.get_absolute_url }}">
+      <img
+        class="dashboard-post-image"
+        src="{{ post.photo.url }}"
+        alt="no image found"
+      />
+    </a>
+  </div>
+  {% endfor %} {% else %}
+  <div class="dashboard-posts-header"></div>
+  {% endif %}
+</div>
