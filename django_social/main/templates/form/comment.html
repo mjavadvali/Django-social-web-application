@@ -1,5 +1,5 @@
 ﻿<div class="comment-form">
-  <form action="{% url 'main:handle_comment' object.slug %}" method="post">
+  <form action="{% url 'main:handle_comment' post.slug %}" method="post">
     {% csrf_token %} {{ form.content }}
     <div
       class="reply-form"

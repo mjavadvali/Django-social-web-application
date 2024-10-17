@@ -29,11 +29,24 @@ class CommentForm(forms.ModelForm):
         }
         
         widgets = {
-            'content' : forms.TextInput(),
+            'content': forms.TextInput(attrs={
+                'class': 'comment-input',
+                'placeholder': 'Comment ...',
+            }),
+            'parent': forms.Select(attrs={
+                'class': 'reply-input-choices',  
+            }),
         }
     
     def __init__(self, *args, **kwargs):
+        post = kwargs.pop('post', None)
+        
         super(CommentForm, self).__init__(*args, **kwargs)
-        self.fields['content'].widget.attrs.update({'class': 'comment-input', 'placeholder': 'comment ...'})
-        self.fields['parent'].widget.attrs.update({'class': 'reply-input-choices', 'placeholder': 'reply to ...'})
-
+        self.fields['content'].widget.attrs.update({
+            'class': 'comment-input', 
+            'placeholder': 'comment ...'
+        })
+        if post:
+            self.fields['parent'].queryset = Comment.objects.filter(post=post)
+            
+    

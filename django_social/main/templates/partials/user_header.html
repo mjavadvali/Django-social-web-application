@@ -26,13 +26,25 @@
     {% else %}
 
     <form
+      class="change-avatar-form"
       enctype="multipart/form-data"
       action="{% url 'dashboard' %}"
       method="post"
     >
       {% csrf_token %}
-      <input type="file" name="avatar" accept="image/*" />
-      <input type="submit" placeholder="save" />
+      <label>change avatar</label>
+      <input
+        style="border: none"
+        id="avatar"
+        type="file"
+        name="avatar"
+        accept="image/*"
+      />
+      <input
+        type="submit"
+        placeholder="save"
+        style="width: 4rem; height: 30px"
+      />
     </form>
     {% endif %}
   </div>

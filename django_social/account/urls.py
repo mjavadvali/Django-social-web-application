@@ -18,8 +18,9 @@ urlpatterns = [
     path('dashboard/user_settings', views.user_settings, name='user_settings'),
     path('profile/<str:username>', views.UserProfileView.as_view(), name='profile'),
     path('profile/profile_settings', views.profile_settings, name='profile_settings'),
-    path('profile/<str:username>/followings', views.show_followings, name='followings'),
-    path('profile/<str:username>/followers', views.show_followers, name='followers'),
+    path('profile/<str:username>/followings', views.FollowingsListView.as_view(), name='followings'),
+    path('profile/<str:username>/followings', views.FollowingsListView.as_view(), name='followings_follow'),
+    path('profile/<str:username>/followers', views.FollowersListView.as_view(), name='followers'),
 
     # path('follow_user/<str:username>', views.follow_user, name='follow_user'),       
     # path('follow_user/<uuid:id>', views.follow_user, name='follow_user'),

@@ -1,10 +1,12 @@
 ﻿{% extends "base.html" %} {% block content %}
 <span></span>
-{% include "navbar/navbar.html" %} {% include "post/post.html" %} 
-{% if request.user == object.user %}
-<a href="{% url 'main:post_delete' object.id %}">
-  <button class="delete-button">Delete</button>
-</a>
+{% include "navbar/navbar.html" %} {% include "post/post.html" %}
+ {% if request.user == post.user %}
+<div class="delete-post">
+  <a href="{% url 'main:post_delete' post.slug %}">
+    <button class="delete-button">Delete</button>
+  </a>
+</div>
 {% endif %}
 <div
   class="comment-section"

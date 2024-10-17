@@ -48,13 +48,24 @@ class PostDetail(ModelFormMixin, DetailView):
     form_class = CommentForm
     context_object_name = 'post'
 
+    def get_object(self):
+        return get_object_or_404(Post, slug=self.kwargs['slug'])
+
+    def get(self, request, *args, **kwargs):
+        post = self.get_object()
+        form = CommentForm(post=post)
+        comments = Comment.objects.filter(post=post)
+        return render(request, self.template_name, {'form': form, 'post': post, 'comments': comments})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         post = self.get_object()
         context['comments'] = Comment.objects.filter(post=post)
         context['form'] = self.form_class
         return context
-
+    # def get_form(self, form_class=None):
+    #     post = self.get_object()
+    #     return self.form_class(post=post)
 
 
 def handle_like(request, slug):
@@ -92,9 +103,11 @@ def handle_like(request, slug):
 def handle_comment(request, slug, parent_id=None):
     post = Post.objects.get(slug=slug)
     user = request.user
-    form = CommentForm()
+    form = CommentForm(post=post)
+    print('comments')
+    print(Comment.objects.filter(post=post))
     if request.method == 'POST':
-        form = CommentForm(request.POST)
+        form = CommentForm(request.POST, post=post)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.user = user
@@ -107,7 +120,7 @@ def handle_comment(request, slug, parent_id=None):
             return redirect('main:post_detail', slug=post.slug)
         else:
             print(form.errors)
-    return redirect('main:post_detail', slug=post.slug)
+    return redirect(request, 'post/post_detail.html', {'form': form})
 
 
 def search_view(request):
@@ -120,8 +133,6 @@ def search_view(request):
 def post_delete(request, slug):
     post = get_object_or_404(Post, slug=slug)
     post.delete()
-    
-    # return redirect(request.META.get('HTTP_REFERER'))
     return redirect('dashboard')
     
 
@@ -148,12 +159,12 @@ def bookmark_post(request, slug):
         
         post.save()
         bookmark.save()
-    
-    next_url = request.GET.get('next')
 
-    if next_url:
-        return redirect(next_url)
-    return redirect('main:listview')
+
+    current_path = request.path
+    if current_path == '/':
+        return redirect('main:listview')
+    return redirect('main:post_detail', slug=post.slug)
 
 
 @login_required

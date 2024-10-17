@@ -1,28 +1,42 @@
 ﻿{% load follow_filter %}
-
+<div style="text-align-last: center">
+  <a href="{% url 'profile' profile_user.username %}">
+    <button style="border: none; background: #50c8e4">back</button>
+  </a>
+</div>
 <div class="followings-container">
   <h2>{{ title }}</h2>
   <div class="following-list">
     {% for user in users %}
     <div class="following-item">
       <div class="profile-img">
-        <img src="{{ user.profile_img.url }}" alt="{{ user.username }}" />
+        <img
+          src="{{ user.user.profile_img.url }}"
+          alt="{{ user.user.username }}"
+        />
       </div>
       <div class="user-info">
-        <a href="{{ user.get_absolute_url }}">{{ user.username }}</a>
-        <p>{{ user.first_name }} {{ user.last_name }}</p>
+        <a href="{{ user.user.get_absolute_url }}">{{ user.user.username }}</a>
+        <p>{{ user.user.first_name }} {{ user.user.last_name }}</p>
       </div>
       <div class="follow-action">
-        <form action="{% url 'profile' user.username %}" method="POST">
+        {% if request.user == user.user %} {% else %}
+        <form action="{% url action_url profile_user.username %}" method="POST">
           {% csrf_token %}
+          <input
+            type="hidden"
+            name="target_user"
+            value="{{user.user.username}}"
+          />
           <button
             id="follow-btn"
             class="follow-button"
-            data-user-username="{{ user.username }}"
+            data-user-username="{{ user.user.username }}"
           >
-            {% if is_following %} Unfollow {% else %} Follow {% endif %}
+            {% if user.is_following %} Unfollow {% else %} Follow {% endif %}
           </button>
         </form>
+        {% endif %}
       </div>
     </div>
     {% empty %}

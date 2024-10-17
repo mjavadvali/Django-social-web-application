@@ -1,12 +1,5 @@
 ﻿<!-- followers.html -->
-{% extends "base.html" %} {% block content %} 
+{% extends "base.html" %} {% block content %} {% include "navbar/navbar.html" %}
+{% include "partials/following_followers.html" with title="Following" users=followers profile_user=profile_user action_url='followers'%}
 
-{% include "navbar/navbar.html" %}
-
-
-{% include "partials/following_followers.html" with title="Followers" followers %} 
-
-
-{% for follower in followers %}
-<p>{{ follower }}</p>
-{% endfor %} {% endblock %}
+{% endblock %}

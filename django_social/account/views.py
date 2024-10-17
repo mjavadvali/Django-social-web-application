@@ -6,13 +6,10 @@ from django.contrib.auth.views import LoginView, LogoutView
 from .forms import SignUpForm
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth import authenticate, login
-from django.views.generic import DetailView
+from django.views.generic import DetailView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from main.models import Post, Bookmark
 from django.core.files.storage import FileSystemStorage
-
-
-
 
 class Login(SuccessMessageMixin, LoginView):
     template_name= 'account/registration/login.html'
@@ -35,38 +32,14 @@ class SignUpView(SuccessMessageMixin, CreateView):
         login(self.request, user)
         return super().form_valid(form)
 
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 
-class UserProfileView(LoginRequiredMixin, DetailView):
-    model = User
-    template_name = 'account/profile/profile.html'
-    
-    def get_object(self):
-        return get_object_or_404(User, username=self.kwargs['username'])
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.get_object()  
-
-        followings = UserFollowing.objects.filter(following_user=user)
-        context['followings'] = [relation.followed_user for relation in followings]
-        
-        followers = UserFollowing.objects.filter(followed_user=user)
-        context['followers'] = [relation.following_user for relation in followers]
-        
-        is_following = UserFollowing.objects.filter(following_user=self.request.user, followed_user=user, value='Follow').exists()
-        context['is_following'] = is_following
-        
-        context['user_posts'] = Post.objects.filter(user=user)
-        context['user'] = user
-        
-        return context
-    
-    def post(self, request, username, *args, **kwargs):
+class FollowUnfollowMixin:
+    def handle_follow_unfollow(self, request, username):
         following_user = request.user  
         followed_user = get_object_or_404(User, username=username)  
         follow_relation = UserFollowing.objects.filter(following_user=following_user, followed_user=followed_user).first()
-
-
 
         if follow_relation:
             if follow_relation.value == 'Follow':
@@ -90,8 +63,35 @@ class UserProfileView(LoginRequiredMixin, DetailView):
         followed_user.save()
     
 
+        
+
+class UserProfileView(LoginRequiredMixin, DetailView, FollowUnfollowMixin):
+    model = User
+    template_name = 'account/profile/profile.html'
+
+    def get(self, request, username, *args, **kwargs):
+        user = get_object_or_404(User, username=username)
+        if request.user == user:
+            return redirect('dashboard')  
+        context = {
+            'profile_user': user,
+        }
+        return render(request, self.template_name, context)
+    
+    def get_object(self):
+        return get_object_or_404(User, username=self.kwargs['username'])
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()  
+        is_following = UserFollowing.objects.filter(following_user=self.request.user, followed_user=user, value='Follow').exists()
+        context['is_following'] = is_following
+        return context
+    
+    def post(self, request, username, *args, **kwargs):
+        self.handle_follow_unfollow(request, username)
         return redirect(reverse('profile', args=[username]))
-       
+
 
 class UserDashboardView(LoginRequiredMixin, DetailView):
     model = User
@@ -121,22 +121,63 @@ class UserDashboardView(LoginRequiredMixin, DetailView):
         return redirect(reverse('dashboard'))
 
 
-def show_followings(request, username):
-    user = get_object_or_404(User, username=username)
-    followings = UserFollowing.objects.filter(following_user=user, value='Follow')
+class FollowingsListView(LoginRequiredMixin , View, FollowUnfollowMixin):
+    template_name = 'account/profile/followings.html'
+    
+    def get(self, request, username, *args, **kwargs):
+        user = get_object_or_404(User, username=username)
+        
+        following_users = UserFollowing.objects.filter(following_user=user, value='Follow')
+        
+        followings_with_status = []
+        for relation in following_users:
+            followed_user = relation.followed_user
+            is_following = UserFollowing.objects.filter(
+                            following_user=self.request.user, 
+                            followed_user=followed_user, value='Follow').exists()
+            followings_with_status.append({'user': followed_user, 'is_following': is_following})
+        
+        context = {
+            'followings': followings_with_status,
+            'profile_user': user,
+        }
+        print('hello')
+        print(followings_with_status)
+        return render(request, self.template_name, context)
+    
+    def post(self, request, username, *args, **kwargs):
+        target_user = request.POST.get('target_user')
+        self.handle_follow_unfollow(request, target_user)
+        return redirect(reverse('followings', args=[username]))
 
-    following_users = [following.followed_user for following in followings]
-
-    return render(request, 'account/profile/followings.html', {'followings': following_users})
-
-
-def show_followers(request, username):
-    user = get_object_or_404(User, username=username)
-    followers = UserFollowing.objects.filter(followed_user=user, value='Follow')
-
-    follower_users = [follower.followed_user for follower in followers]
-
-    return render(request, 'account/profile/followers.html', {'followers': follower_users})
+class FollowersListView(LoginRequiredMixin , View, FollowUnfollowMixin):
+    template_name = 'account/profile/followers.html'
+    
+    def get(self, request, username, *args, **kwargs):
+        user = get_object_or_404(User, username=username)
+        follower_users = UserFollowing.objects.filter(followed_user=user, value='Follow')
+        followers = [relation.following_user for relation in follower_users]
+        followers_with_status = []
+        for follower in followers:
+            is_following = UserFollowing.objects.filter(
+                            following_user=request.user, 
+                            followed_user=follower, value='Follow').exists()
+            followers_with_status.append({
+                'user': follower,
+                'is_following': is_following
+            })
+        
+        context = {
+            'followers': followers_with_status,
+            'profile_user': user,
+        }
+        
+        return render(request, self.template_name, context)
+    
+    def post(self, request, username, *args, **kwargs):
+        target_user = request.POST.get('target_user')
+        self.handle_follow_unfollow(request, target_user)
+        return redirect(reverse('followers', args=[username]))
 
 
 
