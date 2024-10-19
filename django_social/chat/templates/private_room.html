@@ -1,0 +1,202 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Chat Room</title>
+  </head>
+  <body>
+    <div class="chat-wrapper">
+      <div id="profile-header">
+        <img
+          style="width: 80px; height: 80px; border-radius: 50%"
+          src="{{user.profile_img.url}}"
+          alt=""
+        />
+        <h3>{{user.username}}</h3>
+      </div>
+
+      <div id="chat-container"></div>
+      <div class="sending-message">
+        <input
+          id="chat-message-input"
+          type="text"
+          size="100"
+          placeholder="Type your message ..."
+        /><br />
+      </div>
+      <input
+        style="
+          width: 100%;
+          background: skyblue;
+          border-end-end-radius: 20px;
+          border-end-start-radius: 20px;
+          height: 2rem;
+        "
+        id="chat-message-submit"
+        type="button"
+        value="Send"
+      />
+    </div>
+    {{ room_name|json_script:"room-name" }}
+    <span></span>
+    {{ request.user.username|json_script:"user-name" }}
+
+    <script>
+      const roomName = JSON.parse(
+        document.getElementById("room-name").textContent
+      );
+      const Username = JSON.parse(
+        document.getElementById("user-name").textContent
+      );
+
+      const chatSocket = new WebSocket(
+        "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
+      );
+
+      chatSocket.onopen = function (e) {
+        console.log("WebSocket is connected.");
+      };
+
+      chatSocket.onerror = function (e) {
+        console.error("WebSocket error:", e);
+      };
+
+      chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+
+        console.log(data.messages);
+        if (data.messages) {
+          const chat = document.getElementById("chat-container");
+          data.messages.forEach((msg) => {
+            const source = msg.user === Username ? "me" : "other";
+            const name = msg.user === Username ? "Me" : msg.user;
+            const time = new Date(msg.timestamp).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+            chat.innerHTML +=
+              '<div class="message ' +
+              source +
+              '">' +
+              "<strong>" +
+              name +
+              "</strong> " +
+              '<span class="date">' +
+              time +
+              "</span><br>" +
+              msg.message +
+              "</div>";
+          });
+
+          chat.scrollTop = chat.scrollHeight;
+        }
+
+        if (data.message) {
+          console.log(data.message);
+          const chat = document.getElementById("chat-container");
+          const source = data.user === Username ? "me" : "other";
+          const name = data.user === Username ? "Me" : data.user;
+          const currentTime = new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          chat.innerHTML +=
+            '<div class="message ' +
+            source +
+            '">' +
+            "<strong>" +
+            name +
+            "</strong> " +
+            '<span class="date">' +
+            currentTime +
+            "</span><br>" +
+            data.message +
+            "</div>";
+
+          chat.scrollTop = chat.scrollHeight;
+        }
+      };
+      chatSocket.onclose = function (e) {
+        console.error("Chat socket closed unexpectedly");
+      };
+
+      const input = document.getElementById("chat-message-input");
+      const submitButton = document.getElementById("chat-message-submit");
+
+      submitButton.addEventListener("click", function (event) {
+        const message = input.value;
+        console.log("message");
+
+        if (message) {
+          chatSocket.send(
+            JSON.stringify({ message: message, username: Username })
+          );
+          input.value = "";
+          input.focus();
+        }
+      });
+
+      input.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          submitButton.click();
+        }
+      });
+
+      input.focus();
+    </script>
+  </body>
+  <style>
+    .chat-wrapper {
+      margin: auto;
+      position: relative;
+      border: 2px solid lightgray;
+      width: 40rem;
+      height: 30rem;
+    }
+    #chat-container {
+      border: none;
+      border-top: 1px solid;
+      width: 100%;
+      height: 90%;
+      background-color: #dfecee;
+      overflow-y: auto;
+    }
+    #chat-message-input {
+      width: 100%;
+      height: 2rem;
+      box-sizing: border-box;
+    }
+    .message {
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    .message {
+      word-wrap: break-word;
+      white-space: normal;
+    }
+    .me {
+      background-color: #9be99b;
+      text-align: right;
+    }
+    .other {
+      background-color: #e2a0e5;
+      text-align: left;
+    }
+    #chat-container {
+      border-top: 2px solid lightgray;
+      overflow-y: auto;
+      box-sizing: border-box;
+      border: 1px solid;
+    }
+    #profile-header {
+      background: aliceblue;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+  </style>
+</html>

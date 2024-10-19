@@ -3,14 +3,15 @@ from account.models import User
 
 class Chat(models.Model):
     users = models.ManyToManyField(User, related_name='chat_users')
-
+    
     def chat_room_name(self, user1, user2):
-        return f'{user1.id}{user2.id}'
+        sorted_usernames = sorted([user1.username, user2.username])
+        return f'{sorted_usernames[0]}-{sorted_usernames[1]}'
     
     def __str__(self):
         users = self.users.all()
-
-        return f'{users[0].username}-{users[1].username}'
+        sorted_username = sorted([users[0].username, users[1].username])
+        return f'{sorted_username[0]}-{sorted_username[1]}'
 
 
 class Message(models.Model):

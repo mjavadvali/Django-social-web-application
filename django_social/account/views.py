@@ -74,7 +74,7 @@ class UserProfileView(LoginRequiredMixin, DetailView, FollowUnfollowMixin):
         if request.user == user:
             return redirect('dashboard')  
         context = {
-            'profile_user': user,
+            'user': user,
         }
         return render(request, self.template_name, context)
     

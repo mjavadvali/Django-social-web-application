@@ -10,7 +10,7 @@
     <div class="button-container">
       {% if button_text %}
       <button class="message-button">
-        <a href="{% url 'private_chat' user.username %}"> Message </a>
+        <a href="{% url 'private_room' user.username %}"> Message </a>
       </button>
       <form action="{% url 'profile' user.username %}" method="POST">
         {% csrf_token %}
