@@ -34,9 +34,6 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     'rest_framework',
 
-    'api.api_main',
-
-
 ]
 
 MIDDLEWARE = [
