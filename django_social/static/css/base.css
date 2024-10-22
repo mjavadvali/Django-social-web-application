@@ -673,3 +673,31 @@ input #comment-form {
     background: #e07272;
     height: 2rem;
 }
+
+.user-header {
+  border-bottom: none;
+  width: 61rem;
+  height: 14rem;
+  margin: auto;
+  border: 2px solid;
+}
+
+
+.saved-posts-wraper {
+  display: grid;
+  grid-template-columns: 1fr 3fr; 
+  column-gap: 4rem; 
+}
+
+.saved-posts-wraper > *:first-child {
+  grid-column: 1 / 2; 
+}
+
+.dashboard-user-posts {
+  grid-column: 2 / 3; /* Posts in the second column */
+}
+
+
+.dashboard-posts-header {
+  justify-self: center;
+}

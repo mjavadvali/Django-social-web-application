@@ -50,7 +50,11 @@
       );
 
       const chatSocket = new WebSocket(
-        "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
+        (window.location.protocol === "https:" ? "wss://" : "ws://") +
+          window.location.host +
+          "/ws/chat/" +
+          roomName +
+          "/"
       );
 
       chatSocket.onopen = function (e) {

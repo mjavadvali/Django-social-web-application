@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'account',
-    'chat',
+    'chat.apps.ChatConfig',
     'rest_framework',
 
     'api.api_main',

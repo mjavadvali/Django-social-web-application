@@ -1,26 +1,35 @@
 ﻿{% extends "base.html" %} {% block content %} {% include "navbar/navbar.html" %}
-{% include "dashboard/dashboard_navbar.html" %}
 
-<div class="dashboard-user-posts">
-  {% if saved_posts.count == 0 %}
-  <div class="dashboard-posts-header">
-    <h1>You have'nt saved any posts.</h1>
+<div class="saved-posts-wraper">
+  {% include "dashboard/dashboard_navbar.html" %}
+
+  <div class="dashboard-user-posts">
+    {% if saved_posts.count == 0 %}
+    <div class="dashboard-posts-header">
+      <h1>You have'nt saved any posts.</h1>
+    </div>
+    {% else %}
+    <div class="dashboard-posts-header">
+      <h1>Saved posts</h1>
+    </div>
+    {% endif %}
+    <div
+      style="display: grid; grid-template-columns: repeat(2, 22rem)"
+      class="saved-posts"
+    >
+      {% for post in saved_posts %}
+      <div class="user-post">
+        <a href="{{ post.post.get_absolute_url }}">
+          <img
+            class="dashboard-post-image"
+            src="{{ post.post.photo.url }}"
+            alt="no photo found"
+          />
+        </a>
+      </div>
+      {% endfor %}
+    </div>
   </div>
-  {% else %}
-  <div class="dashboard-posts-header">
-    <h1>Saved posts</h1>
-  </div>
-  {% endif %} {% for post in saved_posts %}
-  <div class="user-post">
-    <a href="{{ post.post.get_absolute_url }}">
-      <img
-        class="dashboard-post-image"
-        src="{{ post.post.photo.url }}"
-        alt="no photo found"
-      />
-    </a>
-  </div>
-  {% endfor %}
+
+  {% endblock %}
 </div>
-
-{% endblock %}

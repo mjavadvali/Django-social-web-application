@@ -10,6 +10,7 @@ from django.views.generic import DetailView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from main.models import Post, Bookmark
 from django.core.files.storage import FileSystemStorage
+from django.contrib.auth.decorators import login_required
 
 class Login(SuccessMessageMixin, LoginView):
     template_name= 'account/registration/login.html'
@@ -184,7 +185,7 @@ class FollowersListView(LoginRequiredMixin , View, FollowUnfollowMixin):
 def profile_settings(request):
     pass
 
-    
+@login_required
 def saved_posts(request):
     saved_posts = Bookmark.objects.filter(user= request.user)
     return render(request, 'account/dashboard/saved_posts.html', {'saved_posts': saved_posts})

@@ -5,6 +5,8 @@
     restart: always
     volumes:
       - ./data/db:/var/lib/postgresql/data
+    networks:
+      - dj_social
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -15,20 +17,26 @@
   cache:
     image: redis:7.0.4
     restart: always
+    ports:
+      - 6379:6379
     volumes:
       - ./data/cache:/data
+    networks:
+      - dj_social
   
   backend:
     container_name: dj-backend
     build: 
       context: .
       dockerfile: ./config/django/Dockerfile
+    networks:
+      - dj_social
     volumes:
       - ./django_social:/usr/src/app
     working_dir: /usr/src/app
     command: sh -c "python manage.py migrate --no-input --settings=config.settings.prod && \
                     python manage.py collectstatic --no-input --settings=config.settings.prod && \
-                    gunicorn config.wsgi:application --bind 0.0.0.0:8000 --reload"
+                    gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4 --threads 2 --reload"
     ports:
       - "8000:8000"
     environment:
@@ -36,41 +44,58 @@
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=db
     restart: always
     depends_on:
       - cache
 
   nginx:
-    image: nginx:1.23.1
+    build:
+      context: ./config/nginx
+      dockerfile: Dockerfile
     container_name: nginx6
     restart: always
     ports:
       - "80:80"
     depends_on:
+      - asgiserver2
       - backend
+    networks:
+      - dj_social
     volumes:
       - ./config/nginx:/etc/nginx/conf.d
-      # - ./django_social/static:/usr/src/app/static
+      - ./django_social/static:/usr/src/app/static
       - ./django_social/staticfiles:/usr/src/app/staticfiles
       - ./django_social/media:/usr/src/app/media
       - .:/usr/src/app
   
-  daphne:
-    container_name: daphne
-    working_dir: /usr/src/app
-    build: 
+  asgiserver2:
+    build:
       context: .
       dockerfile: ./config/django/Dockerfile
+    container_name: asgiserver2
+    command: sh -c "daphne config.asgi:application --bind 0.0.0.0 --port 9000 --ping-interval 10 --ping-timeout 30"
     volumes:
-      - ./django_social:/usr/src/app
-    command: daphne config.asgi:application -b 0.0.0.0 -p 9000
+      - ./django_social:/app/
+    expose:
+      - 9000
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.prod
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=db
     depends_on:
       - cache
-      - db  
-    expose:
-      - "9000"
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - dj_social
+
+networks:
+  dj_social:
+    driver: bridge

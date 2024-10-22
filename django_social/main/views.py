@@ -27,7 +27,7 @@ class ListPost(LoginRequiredMixin, ListView):
         context['user'] = self.request.user
         return context
     
-
+@login_required
 def tag_users(request):
     if request.method == "POST":
         tagged_users = request.POST.getlist('tagged_users')
@@ -67,7 +67,7 @@ class PostDetail(ModelFormMixin, DetailView):
     #     post = self.get_object()
     #     return self.form_class(post=post)
 
-
+@login_required
 def handle_like(request, slug):
     post = get_object_or_404(Post, slug=slug)
     user = request.user
@@ -99,7 +99,7 @@ def handle_like(request, slug):
     return redirect('main:listview')
 
 
-
+@login_required
 def handle_comment(request, slug, parent_id=None):
     post = Post.objects.get(slug=slug)
     user = request.user
@@ -129,13 +129,13 @@ def search_view(request):
     data = [{'username': user.username, 'url': user.get_absolute_url()} for user in users]
     return JsonResponse(data, safe=False)
 
-        
+@login_required
 def post_delete(request, slug):
     post = get_object_or_404(Post, slug=slug)
     post.delete()
     return redirect('dashboard')
     
-
+@login_required
 def bookmark_post(request, slug):
     post = get_object_or_404(Post, slug=slug)
     user = request.user
