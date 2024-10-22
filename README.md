@@ -21,9 +21,9 @@ from django.core.management.utils import get_random_secret_key
 get_random_secret_key()
 </pre>
 
-<p>Navigate to the <code>book-appointment</code> directory:</p>
+<p>Navigate to the <code>django_social/envs</code> directory:</p>
 <pre>
-cd book-appointment
+cd django_social
 </pre>
 
 <p>Open your <code>.env</code> file located inside the <code>django_social/env/.env</code> directory and replace the <code>SECRET_KEY</code> value with the generated key.</p>
